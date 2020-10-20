@@ -1,0 +1,25 @@
+# Pycache and compiled python files
+__pycache__/
+*py[cod]
+
+# Jupyter notebook checkpoints.
+.ipynb_checkpoints/
+
+# Egg info files produces by pip installation
+*egg-info/
+
+# Data directory
+/data/
+/notebooks/data/
+
+models/
+
+# vscode configuration
+.vscode
+
+.mypy_cache
+
+# Directory with old files
+.archive
+
+
