@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from typing import Tuple
 
 import numpy as np
+import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import patches as mpatches
 
@@ -52,8 +53,9 @@ def create_semantic_segmentation_dataset(num_train_samples: int, num_test_sample
 
     (train_images, train_labels), (test_images, test_labels) = download_mnist()
 
-    train_images, train_labels = preprocess_mnist(images=train_images, labels=train_labels, proportion=proportion_of_mnist,
-                                                  num_classes=num_classes, normalise=True)
+    train_images, train_labels = preprocess_mnist(
+        images=train_images, labels=train_labels, proportion=proportion_of_mnist, num_classes=num_classes,
+        normalise=True)
 
     test_images, test_labels = preprocess_mnist(images=test_images, labels=test_labels, proportion=proportion_of_mnist,
                                                 num_classes=num_classes, normalise=True)
@@ -199,7 +201,6 @@ def create_segmentation_target(images: np.ndarray,
 
             array1 = np.clip(target, a_min=0, a_max=max_array_value, out=target)
 
-
         if labels_are_exclusive:
             target[..., label] = np.where(
                 exclusivity_mask, 0, target[..., label])
@@ -209,7 +210,7 @@ def create_segmentation_target(images: np.ndarray,
     return target
 
 
-def display_grayscale_array(array: np.ndarray, title: str = '', figsize: tuple = (6, 6)) -> None:
+def display_grayscale_array(array: np.ndarray, title: str = '', ax: matplotlib.axes.Axes = None) -> None:
     """Display the grayscale input image.
 
     Parameters:
@@ -217,24 +218,24 @@ def display_grayscale_array(array: np.ndarray, title: str = '', figsize: tuple =
             from the extended dataset.
         title: If provided, this will be added as title of the plot.
     """
-    plt.figure(figsize=figsize)
-    ax = plt.gca()
+    ax = ax or plt.gca()
 
     ax.imshow(array[..., 0], cmap=plt.cm.binary)
     ax.axes.set_yticks([])
     ax.axes.set_xticks([])
 
     if title:
-        plt.title(title)
+        ax.set_title(title)
 
-    plt.show()
+    if not ax:
+        plt.show()
 
 
 def display_segmented_image(y: np.ndarray, threshold: float = 0.5,
                             input_image: np.ndarray = None,
                             alpha_input_image: float = 0.2,
-                            figsize: tuple = (6, 6),
-                            title: str = '') -> None:
+                            title: str = '',
+                            ax: matplotlib.axes.Axes = None) -> None:
     """Display segemented image.
 
     This function displays the image where each class is shown in particular color.
@@ -249,6 +250,8 @@ def display_segmented_image(y: np.ndarray, threshold: float = 0.5,
         alpha_input_image: If an input_image is provided, the transparency of
             the input_image.
     """
+    ax = ax or plt.gca()
+
     base_array = np.ones(
         (y.shape[0], y.shape[1], 3)) * 1
     legend_handles = []
@@ -259,18 +262,19 @@ def display_segmented_image(y: np.ndarray, threshold: float = 0.5,
         base_array[y[..., i] > threshold] = colour
         legend_handles.append(mpatches.Patch(color=colour, label=str(i)))
 
-    plt.figure(figsize=figsize)
-    plt.imshow(base_array)
-    plt.legend(handles=legend_handles, bbox_to_anchor=(1, 1), loc='upper left')
-    plt.yticks([])
-    plt.xticks([])
-    plt.title(title)
+    # plt.figure(figsize=figsize)
+    ax.imshow(base_array)
+    ax.legend(handles=legend_handles, bbox_to_anchor=(1, 1), loc='upper left')
+    ax.set_yticks([])
+    ax.set_xticks([])
+    ax.set_title(title)
 
     if input_image is not None:
-        plt.imshow(input_image[..., 0],
+        ax.imshow(input_image[..., 0],
                    cmap=plt.cm.binary, alpha=alpha_input_image)
 
-    plt.show()
+    if not ax:
+        plt.show()
 
 
 def plot_class_masks(y_true: np.ndarray, y_predicted: np.ndarray = None, title='') -> None:
@@ -284,13 +288,13 @@ def plot_class_masks(y_true: np.ndarray, y_predicted: np.ndarray = None, title='
         y_predicted: Predicted segmentation (image_shape, num_classes).
             If y_predicted is not provided, only the true values are displayed.
     """
-    num_rows = 2 if y_predicted else 1
+    num_rows = 2 if y_predicted is not None else 1
 
     num_classes = y_true.shape[-1]
     fig, axes = plt.subplots(num_rows, num_classes, figsize=(num_classes * 4, num_rows * 4))
     axes = axes.reshape(-1, num_classes)
-
     fig.suptitle(title)
+    plt.tight_layout()
 
     for label in range(num_classes):
         axes[0, label].imshow(y_true[..., label], cmap=plt.cm.binary)
@@ -299,8 +303,8 @@ def plot_class_masks(y_true: np.ndarray, y_predicted: np.ndarray = None, title='
 
         if label == 0:
             axes[0, label].set_ylabel(f'Target')
-        
-        if y_predicted:
+
+        if y_predicted is not None:
             if label == 0:
                 axes[1, label].set_ylabel(f'Predicted')
 
@@ -310,6 +314,5 @@ def plot_class_masks(y_true: np.ndarray, y_predicted: np.ndarray = None, title='
             axes[1, label].axes.set_xticks([])
         else:
             axes[0, label].set_xlabel(f'Label: {label}')
-
 
     plt.show()
