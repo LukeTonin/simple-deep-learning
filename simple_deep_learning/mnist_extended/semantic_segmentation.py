@@ -38,7 +38,7 @@ def create_semantic_segmentation_dataset(num_train_samples: int, num_test_sample
             to each output image. The number is randomly selected between min_num_digits_per_image and
             max_num_digits_per_image (included).
         num_classes: Integer between 1 and 10. Only select images/labels between 0 and num_classes-1.
-        max_iou: The maximum allowed IOU (intersection over union) between two overlayed images.
+        max_iou: The maximum allowed IOU (intersection over union) between two overlaid images.
             A lower number means digits will overlap less.
         labels_are_exclusive: If True, each pixel can only belong to one class. If False,
             a pixel can be multiple digits at the same time.
@@ -111,7 +111,7 @@ def create_semantic_segmentation_data_from_digits(digits: np.ndarray,
             to each output image. The number is randomly selected between min_num_digits_per_image and
             max_num_digits_per_image (included).
         num_classes: Integer between 1 and 10. Indicating the number of classes used in the dataset.
-        max_iou: The maximum allowed IOU (intersection over union) between two overlayed images.
+        max_iou: The maximum allowed IOU (intersection over union) between two overlaid images.
             A lower number means digits will overlap less.
         labels_are_exclusive: If True, each pixel can only belong to one class. If False,
             a pixel can be multiple digits at the same time.
@@ -129,7 +129,7 @@ def create_semantic_segmentation_data_from_digits(digits: np.ndarray,
         num_digits = np.random.randint(
             min_num_digits_per_image, max_num_digits_per_image + 1)
 
-        input_array, arrays_overlayed, labels_overlayed, bounding_boxes_overlayed = overlay_arrays(
+        input_array, arrays_overlaid, labels_overlaid, bounding_boxes_overlaid = overlay_arrays(
             array_shape=image_shape + (1, ),
             input_arrays=digits,
             input_labels=digit_labels,
@@ -137,9 +137,9 @@ def create_semantic_segmentation_data_from_digits(digits: np.ndarray,
             num_input_arrays_to_overlay=num_digits,
             max_iou=max_iou)
 
-        target_array = create_segmentation_target(images=arrays_overlayed,
-                                                  labels=labels_overlayed,
-                                                  bounding_boxes=bounding_boxes_overlayed,
+        target_array = create_segmentation_target(images=arrays_overlaid,
+                                                  labels=labels_overlaid,
+                                                  bounding_boxes=bounding_boxes_overlaid,
                                                   image_shape=image_shape,
                                                   num_classes=num_classes,
                                                   labels_are_exclusive=labels_are_exclusive,
@@ -162,14 +162,14 @@ def create_segmentation_target(images: np.ndarray,
                                labels_are_exclusive: bool = False,
                                target_is_whole_bounding_box: bool = False
                                ) -> np.ndarray:
-    """Creates the target (aka y value) based on the base images that were overlayed.
+    """Creates the target (aka y value) based on the base images that were overlaid.
 
     Parameters:
-        images: MNIST digits that were overlayed.
-        labels: Labels of the digits that were overlayed.
+        images: MNIST digits that were overlaid.
+        labels: Labels of the digits that were overlaid.
         bounding_boxes: Bounding boxes (wrt output image) of the digits.
         num_classes: Integer between 1 and 10. Indicating the number of classes used in the dataset.
-        max_iou: The maximum allowed IOU (intersection over union) between two overlayed images.
+        max_iou: The maximum allowed IOU (intersection over union) between two overlaid images.
             A lower number means digits will overlap less.
         labels_are_exclusive: If True, each pixel can only belong to one class. If False,
             a pixel can be multiple digits at the same time.
@@ -220,7 +220,10 @@ def display_grayscale_array(array: np.ndarray, title: str = '', ax: matplotlib.a
     """
     ax = ax or plt.gca()
 
-    ax.imshow(array[..., 0], cmap=plt.cm.binary)
+    if len(array.shape) == 3:
+        array = array[..., 0]
+
+    ax.imshow(array, cmap=plt.cm.binary)
     ax.axes.set_yticks([])
     ax.axes.set_xticks([])
 

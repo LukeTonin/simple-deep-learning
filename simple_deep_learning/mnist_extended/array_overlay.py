@@ -23,20 +23,20 @@ def overlay_arrays(array_shape: tuple,
     Parameters:
         array_shape: The shape of the output array.
         input_arrays: Each row corresponds to an input array that
-            can be overlayed on the output array.
+            can be overlaid on the output array.
         input_labels: Same thing as input_arrays but contains the labels.
         num_input_arrays_to_overlay: The number of arrays to attempt to 
            add to the output array.
         max_array_value: The maximum allowed value for this array.
             Any number larger than this will be clipped.
             Clipping is necessary because the overlaying is done by summing arrays.
-        max_iou: The maximum allowed IOU between two overlayed arrays.
+        max_iou: The maximum allowed IOU between two overlaid arrays.
 
     Returns:
         output_array: The output array of size array_shape.
-        arrays_used: an array of shape (num_arrays_overlayed, input_array_shape)
-        labels_overlayed: an array of shape (num_images_overlayed, input_label_shape)
-        bounding_boxes_overlayed: an array of shape (num_images_overlayed, 4)
+        arrays_used: an array of shape (num_arrays_overlaid, input_array_shape)
+        labels_overlaid: an array of shape (num_images_overlaid, input_label_shape)
+        bounding_boxes_overlaid: an array of shape (num_images_overlaid, 4)
             The bounding boxes are absolute pixel values in the format xmin, ymin, xmax, ymax
     """
 
@@ -46,7 +46,7 @@ def overlay_arrays(array_shape: tuple,
         len(input_arrays), size=num_input_arrays_to_overlay)
     bounding_boxes = []
     bounding_boxes_as_tuple = []
-    indices_overlayed = []
+    indices_overlaid = []
     for i in indices:
         bounding_box = overlay_at_random(
             array1=output_array, array2=input_arrays[i],
@@ -56,17 +56,17 @@ def overlay_arrays(array_shape: tuple,
         if bounding_box is None:
             break
 
-        indices_overlayed.append(i)
+        indices_overlaid.append(i)
 
         bounding_boxes_as_tuple.append(
             format_bounding_box(bounding_box, output_type='tuple'))
         bounding_boxes.append(bounding_box)
 
-    arrays_overlayed = input_arrays[indices_overlayed]
-    labels_overlayed = input_labels[indices_overlayed]
-    bounding_boxes_overlayed = np.stack(bounding_boxes_as_tuple)
+    arrays_overlaid = input_arrays[indices_overlaid]
+    labels_overlaid = input_labels[indices_overlaid]
+    bounding_boxes_overlaid = np.stack(bounding_boxes_as_tuple)
 
-    return output_array, arrays_overlayed, labels_overlayed, bounding_boxes_overlayed
+    return output_array, arrays_overlaid, labels_overlaid, bounding_boxes_overlaid
 
 
 def overlay_at_random(array1: np.ndarray, array2: np.ndarray,
@@ -94,7 +94,7 @@ def overlay_at_random(array1: np.ndarray, array2: np.ndarray,
             bounding_boxes.
 
     Returns:
-        The bounding box of the added image if successfully overlayed. Otherwise None.
+        The bounding box of the added image if successfully overlaid. Otherwise None.
     """
     if not bounding_boxes:
         bounding_boxes = []
@@ -146,7 +146,7 @@ def overlay_array(array1: np.ndarray, array2: np.ndarray, x: int, y: int, max_ar
             Clipping is necessary because the overlaying is done by summing arrays.
     
     Returns:
-        array1: array1 with array2 overlayed at the position x, y.
+        array1: array1 with array2 overlaid at the position x, y.
 
     """
 

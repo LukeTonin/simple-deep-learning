@@ -41,7 +41,7 @@ def create_object_detection_dataset(num_train_samples: int, num_test_samples: in
             to each output image. The number is randomly selected between min_num_digits_per_image and
             max_num_digits_per_image (included).
         num_classes: Integer between 1 and 10. Only select images/labels between 0 and num_classes-1.
-        max_iou: The maximum allowed IOU (intersection over union) between two overlayed images.
+        max_iou: The maximum allowed IOU (intersection over union) between two overlaid images.
             A lower number means digits will overlap less.
         proportion_of_mnist: The proportion of total mnist images to use when generating this
             dataset. Smaller values will slightly speed up preprocessing (but not much).
@@ -102,7 +102,7 @@ def create_object_detection_data_from_digits(digits: np.ndarray,
             to each output image. The number is randomly selected between min_num_digits_per_image and
             max_num_digits_per_image (included).
         num_classes: Integer between 1 and 10. Indicating the number of classes used in the dataset.
-        max_iou: The maximum allowed IOU (intersection over union) between two overlayed images.
+        max_iou: The maximum allowed IOU (intersection over union) between two overlaid images.
             A lower number means digits will overlap less.
 
         Returns:
@@ -119,7 +119,7 @@ def create_object_detection_data_from_digits(digits: np.ndarray,
         num_digits = np.random.randint(
             min_num_digits_per_image, max_num_digits_per_image + 1)
 
-        input_array, arrays_overlayed, labels_overlayed, bounding_boxes_overlayed = overlay_arrays(
+        input_array, arrays_overlaid, labels_overlaid, bounding_boxes_overlaid = overlay_arrays(
             array_shape=image_shape + (1, ),
             input_arrays=digits,
             input_labels=digit_labels,
@@ -128,8 +128,8 @@ def create_object_detection_data_from_digits(digits: np.ndarray,
             max_iou=max_iou)
 
         x.append(input_array)
-        labels.append(labels_overlayed)
-        bounding_boxes.append(bounding_boxes_overlayed)
+        labels.append(labels_overlaid)
+        bounding_boxes.append(bounding_boxes_overlaid)
 
     x = np.stack(x)
 
