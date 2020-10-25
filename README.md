@@ -1,6 +1,6 @@
 # Simple deep learning
 
-![png](./mnist_extended_files/featured_image.png)
+![png](./resources/featured_image.png)
 
 THIS REPOSITORY IS A WORK IN PROGRESS
 
